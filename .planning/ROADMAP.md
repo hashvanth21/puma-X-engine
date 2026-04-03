@@ -49,9 +49,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Camera integration — getUserMedia, MediaPipe setup or simulation mode fallback
-- [ ] 02-02: Foot landmark analysis — extract width/arch/pronation/size from landmarks or deterministic mock
-- [ ] 02-03: Scan UI — animated overlay, progress indicator, result reveal animation
+- [x] 02-01: Camera integration — getUserMedia, MediaPipe setup or simulation mode fallback
+- [x] 02-02: Foot landmark analysis — extract width/arch/pronation/size from landmarks or deterministic mock
+- [x] 02-03: Scan UI — animated overlay, progress indicator, result reveal animation
 
 ### Phase 3: Context Questionnaire
 **Goal**: Build Screen 3 — 5-step visual questionnaire. Each step is a full-screen card with icon-based options. Steps: (1) Use case, (2) Daily hours, (3) Activity type, (4) Climate, (5) Comfort vs Performance slider. Answers accumulate in Zustand. Include progress indicator and smooth step transitions.
