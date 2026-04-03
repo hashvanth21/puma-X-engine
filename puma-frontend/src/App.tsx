@@ -1,121 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import { NavBar } from '@/components';
+import { useAppStore } from '@/stores';
+
+// Lazy-load screens for code splitting
+import { lazy, Suspense } from 'react';
+const Screen1Problem = lazy(() => import('@/screens/Screen1Problem/Screen1Problem'));
+const Screen2FootScan = lazy(() => import('@/screens/Screen2FootScan/Screen2FootScan'));
+const Screen3Questions = lazy(() => import('@/screens/Screen3Questions/Screen3Questions'));
+const Screen4Match = lazy(() => import('@/screens/Screen4Match/Screen4Match'));
+const Screen5Compare = lazy(() => import('@/screens/Screen5Compare/Screen5Compare'));
+const Screen6Ecosystem = lazy(() => import('@/screens/Screen6Ecosystem/Screen6Ecosystem'));
+
+const ScreenFallback = () => (
+  <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+    <div className="w-8 h-8 border-2 border-accent rounded-full border-t-transparent animate-spin" />
+  </div>
+);
 
 function App() {
-  const [count, setCount] = useState(0)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { resetAll, currentScreen } = useAppStore();
+
+  const handleReset = () => {
+    resetAll();
+    navigate('/');
+  };
+
+  const isOnFlow = location.pathname !== '/';
+  const screenToStep: Record<string, number> = {
+    '/scan': 1,
+    '/questions': 2,
+    '/match': 3,
+    '/compare': 4,
+    '/ecosystem': 5,
+  };
+  const currentStep = screenToStep[location.pathname];
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="min-h-screen bg-bg-primary">
+      <NavBar
+        currentStep={isOnFlow ? currentStep : undefined}
+        totalSteps={isOnFlow ? 5 : undefined}
+        onReset={isOnFlow ? handleReset : undefined}
+      />
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <Suspense fallback={<ScreenFallback />}>
+        <AnimatePresence mode="wait" initial={false}>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Screen1Problem />} />
+            <Route path="/scan" element={<Screen2FootScan />} />
+            <Route path="/questions" element={<Screen3Questions />} />
+            <Route path="/match" element={<Screen4Match />} />
+            <Route path="/compare" element={<Screen5Compare />} />
+            <Route path="/ecosystem" element={<Screen6Ecosystem />} />
+          </Routes>
+        </AnimatePresence>
+      </Suspense>
+    </div>
+  );
 }
 
-export default App
+export default App;
