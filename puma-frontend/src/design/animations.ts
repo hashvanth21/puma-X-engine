@@ -81,3 +81,23 @@ export const scoreBarVariant: Variants = {
     transition: { duration: 0.8, ease: 'easeOut', delay: 0.2 },
   }),
 };
+
+// Scan-specific animations
+export const scanPulse: Variants = {
+  idle: { scale: 1, opacity: 0.4 },
+  pulse: {
+    scale: [1, 1.04, 1],
+    opacity: [0.4, 1, 0.4],
+    transition: { duration: 1.6, repeat: Infinity, ease: 'easeInOut' },
+  },
+};
+
+export const scanReveal: Variants = {
+  hidden: { opacity: 0, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
+};
+
