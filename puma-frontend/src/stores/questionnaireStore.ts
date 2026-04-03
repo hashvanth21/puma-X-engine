@@ -1,4 +1,4 @@
-import { UserContext } from '@/types';
+import type { UserContext } from '@/types';
 
 export interface QuestionnaireSlice {
   context: Partial<UserContext>;

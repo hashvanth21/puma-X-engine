@@ -1,4 +1,4 @@
-import { FootProfile } from '@/types';
+import type { FootProfile } from '@/types';
 
 export interface FootProfileSlice {
   footProfile: FootProfile | null;

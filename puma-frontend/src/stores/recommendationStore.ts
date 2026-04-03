@@ -1,4 +1,4 @@
-import { Recommendation } from '@/types';
+import type { Recommendation } from '@/types';
 
 export interface RecommendationSlice {
   recommendation: Recommendation | null;

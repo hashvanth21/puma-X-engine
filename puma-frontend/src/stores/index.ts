@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { FootProfileSlice, createFootProfileSlice } from './footProfileStore';
-import { QuestionnaireSlice, createQuestionnaireSlice } from './questionnaireStore';
-import { RecommendationSlice, createRecommendationSlice } from './recommendationStore';
+import { type FootProfileSlice, createFootProfileSlice } from './footProfileStore';
+import { type QuestionnaireSlice, createQuestionnaireSlice } from './questionnaireStore';
+import { type RecommendationSlice, createRecommendationSlice } from './recommendationStore';
 
 interface NavigationSlice {
   currentScreen: number;
