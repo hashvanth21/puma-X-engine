@@ -12,13 +12,12 @@ An AI-powered pre-purchase reality simulation system built for PUMA. Instead of 
 
 ### Validated
 
-<!-- None yet — ship to validate -->
-
-(None yet — ship to validate)
+- [x] Camera-based 3D foot scan (width, arch type, estimated size) via phone — *Validated in Phase 2: Foot Scan Module*
+- [x] Premium demo UI scan screen with cinematic animations — *Validated in Phase 2: Foot Scan Module*
 
 ### Active
 
-- [ ] Camera-based 3D foot scan (width, arch type, estimated size) via phone
+
 - [ ] 5-question contextual questionnaire (use case, hours/day, activity, climate, priority)
 - [ ] AI recommendation engine matching foot profile + context to PUMA shoe catalog
 - [ ] Explainable match result: best shoe + alternate + reasons + "why not others"
@@ -92,4 +91,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after initialization via PRD Express Path*
+*Last updated: 2026-04-03 — Phase 2 (Foot Scan Module) complete*
