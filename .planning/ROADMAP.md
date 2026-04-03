@@ -32,7 +32,7 @@ Six-phase execution plan to build a premium AI-powered shoe-matching demo for PU
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Project scaffold — Vite+React+TS+Tailwind+Framer Motion+Zustand+ESLint setup
+- [x] 01-01: Project scaffold — Vite+React+TS+Tailwind+Framer Motion+Zustand+ESLint setup
 - [ ] 01-02: Design system — tokens, typography, color palette, animation primitives, shared components
 - [ ] 01-03: Demo shell — navigation, routing (React Router), Screen 1 "Your Current Problem" implementation
 
