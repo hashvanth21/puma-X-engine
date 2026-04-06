@@ -1,285 +1,177 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Clock, MapPin, Activity, Cloud, SlidersHorizontal, Check } from 'lucide-react';
-import { PageWrapper, Button, Card } from '@/components';
-import { useAppStore } from '@/stores';
-import { fadeInUp, slideInRight, itemReveal, staggerContainer } from '@/design/animations';
+import { motion } from 'framer-motion';
+import {
+  ArrowLeft,
+  MapPin,
+  Clock,
+  Activity,
+  Cloud,
+  SlidersHorizontal,
+  Briefcase,
+  Footprints,
+  PersonStanding,
+  Dumbbell,
+  CloudRain,
+  Sun,
+  Timer,
+  BatteryMedium,
+  BatteryFull,
+  Zap,
+} from 'lucide-react';
+import { PageWrapper, Button } from '@/components';
+import { fadeInUp, staggerContainer, itemReveal } from '@/design/animations';
+import { useQuestionnaire } from '@/hooks/useQuestionnaire';
+import { StepProgress } from './StepProgress';
+import { QuestionStep, type QuestionOption } from './QuestionStep';
+import { PrioritySlider } from './PrioritySlider';
 import type { UseCase, ActivityType, Climate } from '@/types';
 
-type StepKey = 'useCase' | 'hours' | 'activity' | 'climate' | 'priority';
+/* ────────────────────────────────────────────
+ * Step configuration
+ * ──────────────────────────────────────────── */
 
-interface StepConfig {
-  key: StepKey;
+interface StepMeta {
+  key: string;
   title: string;
   subtitle: string;
   icon: React.ReactNode;
 }
 
-const steps: StepConfig[] = [
-  { key: 'useCase', title: 'Where will you use it?', subtitle: 'Select your primary environment', icon: <MapPin size={22} /> },
+const STEPS: StepMeta[] = [
+  { key: 'useCase', title: 'Where will you use them most?', subtitle: 'Select your primary environment', icon: <MapPin size={22} /> },
   { key: 'hours', title: 'How many hours per day?', subtitle: 'Average daily wear time', icon: <Clock size={22} /> },
-  { key: 'activity', title: 'What activity type?', subtitle: 'Your primary movement pattern', icon: <Activity size={22} /> },
-  { key: 'climate', title: 'What is your climate?', subtitle: 'Typical weather conditions', icon: <Cloud size={22} /> },
+  { key: 'activity', title: 'Primary activity?', subtitle: 'Your main movement pattern', icon: <Activity size={22} /> },
+  { key: 'climate', title: 'Typical weather conditions?', subtitle: 'Your local climate', icon: <Cloud size={22} /> },
   { key: 'priority', title: 'Comfort or Performance?', subtitle: 'Set your priority balance', icon: <SlidersHorizontal size={22} /> },
 ];
 
-const useCaseOptions: { value: UseCase; label: string; emoji: string }[] = [
-  { value: 'daily-commute', label: 'Daily Commute', emoji: '🚶' },
-  { value: 'office-wear', label: 'Office / Work', emoji: '💼' },
-  { value: 'running', label: 'Running', emoji: '🏃' },
-  { value: 'long-standing', label: 'Long Standing', emoji: '🧍' },
-  { value: 'gym-casual', label: 'Gym + Casual', emoji: '🏋️' },
-  { value: 'rainy-conditions', label: 'Rainy / Wet', emoji: '🌧️' },
+/* ────────────────────────────────────────────
+ * Option data
+ * ──────────────────────────────────────────── */
+
+const useCaseOptions: QuestionOption<UseCase>[] = [
+  { value: 'daily-commute', label: 'Daily Commute', description: 'Everyday travel & errands', icon: <Footprints size={22} /> },
+  { value: 'office-wear', label: 'Office Wear', description: 'Work-day comfort', icon: <Briefcase size={22} /> },
+  { value: 'running', label: 'Running', description: 'Training & racing', icon: <Activity size={22} /> },
+  { value: 'long-standing', label: 'Long Standing', description: 'On your feet 8+ hours', icon: <PersonStanding size={22} /> },
+  { value: 'gym-casual', label: 'Gym & Casual', description: 'Mixed workouts & lifestyle', icon: <Dumbbell size={22} /> },
+  { value: 'rainy-conditions', label: 'Rainy Conditions', description: 'Wet-weather protection', icon: <CloudRain size={22} /> },
 ];
 
-const hoursOptions = [
-  { value: '2-4', label: '2–4 hrs', emoji: '⏱️' },
-  { value: '4-8', label: '4–8 hrs', emoji: '🕐' },
-  { value: '8-12', label: '8–12 hrs', emoji: '🔋' },
-  { value: '12+', label: '12+ hrs', emoji: '⚡' },
+const hoursOptions: QuestionOption<number>[] = [
+  { value: 3, label: '2–4 hours', description: 'Short sessions', icon: <Timer size={22} /> },
+  { value: 5, label: '4–6 hours', description: 'Half-day wear', icon: <Clock size={22} /> },
+  { value: 7, label: '6–8 hours', description: 'Full workday', icon: <BatteryMedium size={22} /> },
+  { value: 9, label: '8–10 hours', description: 'Extended wear', icon: <BatteryFull size={22} /> },
+  { value: 11, label: '10–12 hours', description: 'All-day marathon', icon: <Zap size={22} /> },
 ];
 
-const activityOptions: { value: ActivityType; label: string; emoji: string }[] = [
-  { value: 'running', label: 'Running', emoji: '🏃' },
-  { value: 'walking', label: 'Walking', emoji: '🚶' },
-  { value: 'standing', label: 'Standing', emoji: '🧍' },
-  { value: 'gym-casual', label: 'Gym + Casual', emoji: '🏋️' },
+const activityOptions: QuestionOption<ActivityType>[] = [
+  { value: 'running', label: 'Running', description: 'High-impact cardio', icon: <Activity size={22} /> },
+  { value: 'walking', label: 'Walking', description: 'Low-impact movement', icon: <Footprints size={22} /> },
+  { value: 'standing', label: 'Standing', description: 'Stationary support', icon: <PersonStanding size={22} /> },
+  { value: 'gym-casual', label: 'Gym & Casual', description: 'Mixed training', icon: <Dumbbell size={22} /> },
 ];
 
-const climateOptions: { value: Climate; label: string; emoji: string }[] = [
-  { value: 'rainy', label: 'Rainy / Wet', emoji: '🌧️' },
-  { value: 'dry', label: 'Dry / Hot', emoji: '☀️' },
+const climateOptions: QuestionOption<Climate>[] = [
+  { value: 'rainy', label: 'Rainy / Wet', description: 'Frequent rain & moisture', icon: <CloudRain size={22} /> },
+  { value: 'dry', label: 'Dry / Warm', description: 'Sunshine & ventilation', icon: <Sun size={22} /> },
 ];
+
+/* ────────────────────────────────────────────
+ * Screen Component
+ * ──────────────────────────────────────────── */
 
 export default function Screen3Questions() {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [useCase, setUseCase] = useState<UseCase | null>(null);
-  const [hours, setHours] = useState<string>('');
-  const [activity, setActivity] = useState<ActivityType | null>(null);
-  const [climate, setClimate] = useState<Climate | null>(null);
-  const [priorityScore, setPriorityScore] = useState(50);
-  const setContextField = useAppStore((s) => s.setContextField);
+  const {
+    step,
+    totalSteps,
+    back,
+    select,
+    setPriority,
+    isFirst,
+    context,
+  } = useQuestionnaire();
 
-  const step = steps[currentStep];
-  const progress = ((currentStep + 1) / steps.length) * 100;
+  const meta = STEPS[step];
 
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      if (useCase) setContextField('useCase', useCase);
-      if (activity) setContextField('activity', activity);
-      if (climate) setContextField('climate', climate);
-      setContextField('hoursPerDay', parseInt(hours || '6'));
-      setContextField('priorityScore', priorityScore);
-      navigate('/match');
-    }
-  };
-
+  /* ── Navigation handlers ── */
   const handleBack = () => {
-    if (currentStep > 0) setCurrentStep((prev) => prev - 1);
-    else navigate('/scan');
-  };
-
-  const isStepComplete = (): boolean => {
-    switch (step.key) {
-      case 'useCase': return !!useCase;
-      case 'hours': return !!hours;
-      case 'activity': return !!activity;
-      case 'climate': return !!climate;
-      case 'priority': return true;
-      default: return false;
+    if (isFirst) {
+      navigate('/scan');
+    } else {
+      back();
     }
   };
 
-  const renderOptions = () => {
-    if (step.key === 'useCase') {
-      return (
-        <div className="grid grid-cols-2 gap-3">
-          {useCaseOptions.map((opt) => {
-            const isSelected = useCase === opt.value;
-            return (
-              <motion.button
-                key={opt.value}
-                onClick={() => setUseCase(opt.value)}
-                className={`p-5 rounded-card text-center transition-all duration-200 ${
-                  isSelected
-                    ? 'bg-bg-card shadow-premium ring-2 ring-accent-red/30'
-                    : 'bg-bg-secondary shadow-inset hover:shadow-subtle'
-                }`}
-                whileTap={{ scale: 0.97 }}
-                whileHover={isSelected ? {} : { y: -2 }}
-              >
-                <span className="text-3xl mb-2 block">{opt.emoji}</span>
-                <span className={`text-sm font-medium ${isSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
-                  {opt.label}
-                </span>
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="mt-2 flex justify-center"
-                  >
-                    <div className="w-5 h-5 rounded-full bg-accent-red flex items-center justify-center">
-                      <Check size={12} className="text-white" />
-                    </div>
-                  </motion.div>
-                )}
-              </motion.button>
-            );
-          })}
-        </div>
-      );
-    }
-
-    if (step.key === 'hours') {
-      return (
-        <div className="grid grid-cols-2 gap-3">
-          {hoursOptions.map((opt) => {
-            const isSelected = hours === opt.value;
-            return (
-              <motion.button
-                key={opt.value}
-                onClick={() => setHours(opt.value)}
-                className={`p-5 rounded-card text-center transition-all duration-200 ${
-                  isSelected
-                    ? 'bg-bg-card shadow-premium ring-2 ring-accent-red/30'
-                    : 'bg-bg-secondary shadow-inset hover:shadow-subtle'
-                }`}
-                whileTap={{ scale: 0.97 }}
-                whileHover={isSelected ? {} : { y: -2 }}
-              >
-                <span className="text-3xl mb-2 block">{opt.emoji}</span>
-                <span className={`text-sm font-medium ${isSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
-                  {opt.label}
-                </span>
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="mt-2 flex justify-center"
-                  >
-                    <div className="w-5 h-5 rounded-full bg-accent-red flex items-center justify-center">
-                      <Check size={12} className="text-white" />
-                    </div>
-                  </motion.div>
-                )}
-              </motion.button>
-            );
-          })}
-        </div>
-      );
-    }
-
-    if (step.key === 'activity') {
-      return (
-        <div className="grid grid-cols-2 gap-3">
-          {activityOptions.map((opt) => {
-            const isSelected = activity === opt.value;
-            return (
-              <motion.button
-                key={opt.value}
-                onClick={() => setActivity(opt.value)}
-                className={`p-5 rounded-card text-center transition-all duration-200 ${
-                  isSelected
-                    ? 'bg-bg-card shadow-premium ring-2 ring-accent-red/30'
-                    : 'bg-bg-secondary shadow-inset hover:shadow-subtle'
-                }`}
-                whileTap={{ scale: 0.97 }}
-                whileHover={isSelected ? {} : { y: -2 }}
-              >
-                <span className="text-3xl mb-2 block">{opt.emoji}</span>
-                <span className={`text-sm font-medium ${isSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
-                  {opt.label}
-                </span>
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="mt-2 flex justify-center"
-                  >
-                    <div className="w-5 h-5 rounded-full bg-accent-red flex items-center justify-center">
-                      <Check size={12} className="text-white" />
-                    </div>
-                  </motion.div>
-                )}
-              </motion.button>
-            );
-          })}
-        </div>
-      );
-    }
-
-    if (step.key === 'climate') {
-      return (
-        <div className="grid grid-cols-2 gap-3">
-          {climateOptions.map((opt) => {
-            const isSelected = climate === opt.value;
-            return (
-              <motion.button
-                key={opt.value}
-                onClick={() => setClimate(opt.value)}
-                className={`p-5 rounded-card text-center transition-all duration-200 ${
-                  isSelected
-                    ? 'bg-bg-card shadow-premium ring-2 ring-accent-red/30'
-                    : 'bg-bg-secondary shadow-inset hover:shadow-subtle'
-                }`}
-                whileTap={{ scale: 0.97 }}
-                whileHover={isSelected ? {} : { y: -2 }}
-              >
-                <span className="text-3xl mb-2 block">{opt.emoji}</span>
-                <span className={`text-sm font-medium ${isSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
-                  {opt.label}
-                </span>
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="mt-2 flex justify-center"
-                  >
-                    <div className="w-5 h-5 rounded-full bg-accent-red flex items-center justify-center">
-                      <Check size={12} className="text-white" />
-                    </div>
-                  </motion.div>
-                )}
-              </motion.button>
-            );
-          })}
-        </div>
-      );
-    }
-
-    return null;
+  const handleFinish = () => {
+    navigate('/match');
   };
 
-  const renderPrioritySlider = () => (
-    <div className="py-6">
-      <div className="flex justify-between text-sm text-text-muted mb-4">
-        <span className="font-medium">Comfort</span>
-        <span className="font-medium">Performance</span>
-      </div>
-      <div className="relative h-3 bg-bg-secondary rounded-full shadow-inset overflow-hidden">
-        <motion.div
-          className="absolute top-0 left-0 h-full bg-accent-red rounded-full"
-          animate={{ width: `${priorityScore}%` }}
-          transition={{ duration: 0.2 }}
-        />
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={priorityScore}
-          onChange={(e) => setPriorityScore(Number(e.target.value))}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-      </div>
-      <p className="text-center text-text-secondary font-medium mt-3">
-        {priorityScore < 35 ? 'Maximum comfort focus' : priorityScore > 65 ? 'Maximum performance focus' : 'Balanced approach'}
-      </p>
-    </div>
-  );
+  /* ── Render current step content ── */
+  const renderStep = () => {
+    switch (step) {
+      case 0:
+        return (
+          <QuestionStep<UseCase>
+            stepIndex={step}
+            title={meta.title}
+            subtitle={meta.subtitle}
+            headerIcon={meta.icon}
+            options={useCaseOptions}
+            selectedValue={context.useCase}
+            onSelect={(v) => select('useCase', v)}
+          />
+        );
+      case 1:
+        return (
+          <QuestionStep<number>
+            stepIndex={step}
+            title={meta.title}
+            subtitle={meta.subtitle}
+            headerIcon={meta.icon}
+            options={hoursOptions}
+            selectedValue={context.hoursPerDay}
+            onSelect={(v) => select('hoursPerDay', v)}
+          />
+        );
+      case 2:
+        return (
+          <QuestionStep<ActivityType>
+            stepIndex={step}
+            title={meta.title}
+            subtitle={meta.subtitle}
+            headerIcon={meta.icon}
+            options={activityOptions}
+            selectedValue={context.activity}
+            onSelect={(v) => select('activity', v)}
+          />
+        );
+      case 3:
+        return (
+          <QuestionStep<Climate>
+            stepIndex={step}
+            title={meta.title}
+            subtitle={meta.subtitle}
+            headerIcon={meta.icon}
+            options={climateOptions}
+            selectedValue={context.climate}
+            onSelect={(v) => select('climate', v)}
+          />
+        );
+      case 4:
+        return (
+          <PrioritySlider
+            value={context.priorityScore ?? 50}
+            onChange={setPriority}
+            onFinish={handleFinish}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <PageWrapper className="flex items-center justify-center min-h-screen px-4">
@@ -289,68 +181,19 @@ export default function Screen3Questions() {
         animate="visible"
         className="w-full max-w-lg"
       >
-        {/* Progress */}
+        {/* Step Progress Indicator */}
         <motion.div variants={fadeInUp} className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-text-muted font-medium uppercase tracking-wider">
-              Step {currentStep + 1} of {steps.length}
-            </span>
-            <span className="text-xs text-text-muted font-medium">
-              {Math.round(progress)}%
-            </span>
-          </div>
-          <div className="w-full h-1.5 bg-bg-secondary rounded-full shadow-inset overflow-hidden">
-            <motion.div
-              className="h-full bg-accent-red rounded-full"
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            />
-          </div>
+          <StepProgress current={step} total={totalSteps} />
         </motion.div>
 
-        {/* Question Card */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            variants={slideInRight}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <Card className="p-8">
-              {/* Question Header */}
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-accent-red/10 flex items-center justify-center text-accent-red">
-                  {step.icon}
-                </div>
-                <div>
-                  <h2 className="font-display font-bold text-xl text-text-primary">
-                    {step.title}
-                  </h2>
-                  <p className="text-text-muted text-sm">{step.subtitle}</p>
-                </div>
-              </div>
+        {/* Current Step Content */}
+        {renderStep()}
 
-              {/* Options */}
-              {step.key === 'priority' ? renderPrioritySlider() : renderOptions()}
-            </Card>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Navigation */}
-        <motion.div variants={itemReveal} className="mt-6 flex items-center justify-between">
+        {/* Navigation — Back button */}
+        <motion.div variants={itemReveal} className="mt-6 flex items-center">
           <Button variant="primary" size="sm" onClick={handleBack}>
             <ArrowLeft size={14} className="mr-1" />
             Back
-          </Button>
-          <Button
-            variant="accent"
-            size="sm"
-            onClick={handleNext}
-            disabled={!isStepComplete()}
-          >
-            {currentStep === steps.length - 1 ? 'See My Match' : 'Continue'}
-            <ArrowRight size={14} className="ml-1" />
           </Button>
         </motion.div>
       </motion.div>

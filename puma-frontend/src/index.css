@@ -157,4 +157,51 @@ h1, h2, h3, h4, h5, h6 {
   ::-webkit-scrollbar-thumb:hover {
     background: var(--text-secondary);
   }
+
+  /* Priority Range Slider */
+  .priority-range-input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    outline: none;
+    opacity: 1;
+  }
+
+  .priority-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    border: 3px solid var(--bg-main);
+    box-shadow: 0 0 10px rgba(200, 160, 0, 0.5), var(--shadow-sm);
+    cursor: pointer;
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+
+  .priority-range-input::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 16px rgba(200, 160, 0, 0.7), var(--shadow-sm);
+    transform: scale(1.1);
+  }
+
+  .priority-range-input::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    border: 3px solid var(--bg-main);
+    box-shadow: 0 0 10px rgba(200, 160, 0, 0.5);
+    cursor: pointer;
+  }
+
+  .priority-range-input::-webkit-slider-runnable-track {
+    background: transparent;
+    height: 100%;
+  }
+
+  .priority-range-input::-moz-range-track {
+    background: transparent;
+    height: 100%;
+  }
 }
