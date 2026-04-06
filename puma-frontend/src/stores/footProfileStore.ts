@@ -6,7 +6,9 @@ export interface FootProfileSlice {
   resetFootProfile: () => void;
 }
 
-export const createFootProfileSlice = (set: (fn: (state: FootProfileSlice) => Partial<FootProfileSlice>) => void): FootProfileSlice => ({
+type SetState = (updater: (state: FootProfileSlice) => Partial<FootProfileSlice>) => void;
+
+export const createFootProfileSlice = (set: SetState): FootProfileSlice => ({
   footProfile: null,
   setFootProfile: (profile) => set(() => ({ footProfile: profile })),
   resetFootProfile: () => set(() => ({ footProfile: null })),

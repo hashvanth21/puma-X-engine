@@ -13,16 +13,17 @@ export const MetricCard = ({ label, value, icon, unit, delay = 0 }: MetricCardPr
   <motion.div
     variants={fadeInUp}
     custom={delay}
-    className="glass-card p-5 flex items-center gap-4 group"
+    className="bg-bg-card rounded-card shadow-premium p-5 flex items-center gap-4 group transition-all duration-300 ease-premium hover:shadow-deep hover:-translate-y-0.5"
   >
-    {/* Icon circle */}
     {icon && (
-      <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0 group-hover:bg-accent/20 transition-colors duration-300">
+      <motion.div
+        className="w-11 h-11 rounded-xl bg-accent-red/10 flex items-center justify-center text-accent-red shrink-0 group-hover:bg-accent-red/15 transition-colors duration-300"
+        whileHover={{ scale: 1.05 }}
+      >
         {icon}
-      </div>
+      </motion.div>
     )}
 
-    {/* Text */}
     <div className="flex-1 min-w-0">
       <p className="text-text-muted text-xs uppercase tracking-wider font-medium mb-0.5">
         {label}
@@ -33,12 +34,11 @@ export const MetricCard = ({ label, value, icon, unit, delay = 0 }: MetricCardPr
       </p>
     </div>
 
-    {/* Subtle accent bar on the right */}
     <motion.div
-      className="w-1 h-8 rounded-full bg-gradient-accent"
+      className="w-1 h-8 rounded-full bg-accent-red"
       initial={{ scaleY: 0, originY: 1 }}
       animate={{ scaleY: 1 }}
-      transition={{ delay: delay + 0.3, duration: 0.4, ease: 'easeOut' }}
+      transition={{ delay: delay + 0.3, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     />
   </motion.div>
 );

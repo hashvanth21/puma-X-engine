@@ -13,15 +13,15 @@ const Screen5Compare = lazy(() => import('@/screens/Screen5Compare/Screen5Compar
 const Screen6Ecosystem = lazy(() => import('@/screens/Screen6Ecosystem/Screen6Ecosystem'));
 
 const ScreenFallback = () => (
-  <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-accent rounded-full border-t-transparent animate-spin" />
+  <div className="min-h-screen bg-bg-main flex items-center justify-center">
+    <div className="w-8 h-8 border-2 border-accent-red rounded-full border-t-transparent animate-spin" />
   </div>
 );
 
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { resetAll, currentScreen } = useAppStore();
+  const { resetAll } = useAppStore();
 
   const handleReset = () => {
     resetAll();
@@ -39,7 +39,7 @@ function App() {
   const currentStep = screenToStep[location.pathname];
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <div className="min-h-screen bg-bg-main">
       <NavBar
         currentStep={isOnFlow ? currentStep : undefined}
         totalSteps={isOnFlow ? 5 : undefined}

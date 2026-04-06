@@ -13,7 +13,7 @@ export const PageWrapper = ({ children, className = '' }: PageWrapperProps) => (
     animate="animate"
     exit="exit"
     transition={pageTransition}
-    className={`min-h-screen bg-bg-primary ${className}`}
+    className={`min-h-screen bg-bg-main pt-20 ${className}`}
   >
     {children}
   </motion.div>

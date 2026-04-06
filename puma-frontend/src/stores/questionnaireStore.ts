@@ -6,7 +6,9 @@ export interface QuestionnaireSlice {
   resetContext: () => void;
 }
 
-export const createQuestionnaireSlice = (set: (fn: (state: QuestionnaireSlice) => Partial<QuestionnaireSlice>) => void): QuestionnaireSlice => ({
+type SetState = (updater: (state: QuestionnaireSlice) => Partial<QuestionnaireSlice>) => void;
+
+export const createQuestionnaireSlice = (set: SetState): QuestionnaireSlice => ({
   context: {},
   setContextField: (key, value) => set((state) => ({ context: { ...state.context, [key]: value } })),
   resetContext: () => set(() => ({ context: {} })),

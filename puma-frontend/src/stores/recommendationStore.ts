@@ -6,8 +6,10 @@ export interface RecommendationSlice {
   resetRecommendation: () => void;
 }
 
-export const createRecommendationSlice = (set: (fn: (state: RecommendationSlice) => Partial<RecommendationSlice>) => void): RecommendationSlice => ({
+type SetState = (partial: Partial<RecommendationSlice>) => void;
+
+export const createRecommendationSlice = (set: SetState): RecommendationSlice => ({
   recommendation: null,
-  setRecommendation: (rec) => set(() => ({ recommendation: rec })),
-  resetRecommendation: () => set(() => ({ recommendation: null })),
+  setRecommendation: (rec) => set({ recommendation: rec }),
+  resetRecommendation: () => set({ recommendation: null }),
 });

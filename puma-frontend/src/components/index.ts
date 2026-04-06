@@ -1,7 +1,12 @@
+export { Badge } from './Badge';
 export { Button } from './Button';
 export { Card } from './Card';
-export { Badge } from './Badge';
-export { ProgressBar } from './ProgressBar';
-export { NavBar } from './NavBar';
+export { ColorSwatch } from './ColorSwatch';
+export { FilterChip } from './FilterChip';
 export { MetricCard } from './MetricCard';
+export { NavBar } from './NavBar';
 export { PageWrapper } from './PageWrapper';
+export { ProductCard } from './ProductCard';
+export { ProgressBar } from './ProgressBar';
+export { QuickViewModal } from './QuickViewModal';
+export { SlideInPanel } from './SlideInPanel';
