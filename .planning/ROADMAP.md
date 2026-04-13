@@ -84,9 +84,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: Shoe catalog DB — define schema, populate 10+ PUMA models with full metadata
-- [ ] 04-02: Scoring algorithm — weighted attribute matching, foot profile × context × shoe metadata
-- [ ] 04-03: Explanation generator — rule-based natural language output for match + elimination reasons
+- [ ] 04-01: Shoe Intelligence Database — extended schema, 11 PUMA models with biomechanical scores, backend API (Wave 1)
+- [ ] 04-02: Weighted Scoring Algorithm — 6-dimension scoring engine, frontend service + backend mirror (Wave 2)
+- [ ] 04-03: Explanation Generator — match reasons, elimination logic, integration into engines (Wave 3)
 
 ### Phase 5: Match Result & Comparison UI
 **Goal**: Build Screens 4 and 5 — the payoff of the entire demo. Screen 4: hero match card with shoe image, match percentage, key reasons, "why not others" section. Screen 5: dynamic side-by-side comparison table with attribute scores, icons, and visual differentiators. Include 3D shoe visualization or rich product imagery. This is the screen PUMA leadership will remember.
