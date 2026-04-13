@@ -155,11 +155,11 @@ export function generateRecommendation(
   const alternate = scored[1];
   const eliminated = scored.slice(2, 5);
 
-  const primaryReasons: MatchReason[] = [];
+  const primaryReasons = generateMatchReasons(primary.shoe, footProfile, context);
 
   const eliminatedShoes = eliminated.map((entry) => ({
     shoe: entry.shoe,
-    reason: `Outscored by ${primary.shoe.model} (${primary.score}% vs ${entry.score}%)`,
+    reason: generateEliminationReason(entry.shoe, primary.shoe, footProfile, context),
   }));
 
   return {
@@ -172,3 +172,52 @@ export function generateRecommendation(
     generatedAt: new Date().toISOString(),
   };
 }
+
+// ─── Explanation Generator (inline for backend) ──────────────────
+
+function generateMatchReasons(shoe: Shoe, footProfile: FootProfile, context: UserContext): MatchReason[] {
+  const reasons: MatchReason[] = [];
+
+  if (footProfile.width === 'wide' && shoe.attributes.wideFootScore >= 7) {
+    reasons.push({ attribute: 'Foot Width', explanation: `Your wider foot profile gets room to breathe in the ${shoe.model}'s spacious forefoot`, positive: true });
+  } else if (footProfile.width === 'narrow' && shoe.attributes.wideFootScore <= 4) {
+    reasons.push({ attribute: 'Foot Width', explanation: `The ${shoe.model}'s snug fit wraps your narrower foot securely`, positive: true });
+  }
+
+  if (shoe.attributes.archSuitability.includes(footProfile.arch)) {
+    const tech = shoe.techFeatures[0] || 'cushioning system';
+    reasons.push({ attribute: 'Arch Support', explanation: `The ${tech} in the ${shoe.model} matches your ${footProfile.arch} arch profile`, positive: true });
+  }
+
+  if (shoe.attributes.pronationSupport.includes(footProfile.pronation)) {
+    const guidance = footProfile.pronation === 'overpronation' ? 'stability guidance' : footProfile.pronation === 'supination' ? 'flexible cushioning' : 'neutral platform';
+    reasons.push({ attribute: 'Pronation Control', explanation: `Built-in ${guidance} keeps your stride aligned mile after mile`, positive: true });
+  }
+
+  if (context.climate === 'rainy' && shoe.attributes.wetGripScore >= 6) {
+    reasons.push({ attribute: 'Wet Weather Grip', explanation: `High-traction outsole maintains grip on wet surfaces`, positive: true });
+  }
+
+  if (context.hoursPerDay >= 7 && shoe.attributes.longWearComfortScore >= 7) {
+    reasons.push({ attribute: 'All-Day Comfort', explanation: `With ${context.hoursPerDay}+ hours on your feet, the ${shoe.model}'s cushioning won't compress`, positive: true });
+  }
+
+  if (context.priority === 'performance' && shoe.attributes.raceUseScore >= 7) {
+    reasons.push({ attribute: 'Race Performance', explanation: `Built for speed — responsive energy return for your performance goals`, positive: true });
+  }
+
+  reasons.push({ attribute: 'Use Case Match', explanation: `${shoe.attributes.runningScore}/10 running · ${shoe.attributes.dailyCommuteScore}/10 commute · ${shoe.attributes.longWearComfortScore}/10 comfort`, positive: true });
+
+  return reasons.filter(r => r.positive).slice(0, 5);
+}
+
+function generateEliminationReason(shoe: Shoe, winner: Shoe, footProfile: FootProfile, context: UserContext): string {
+  if (footProfile.width === 'wide' && shoe.attributes.wideFootScore < 4) return `${shoe.model}: Too narrow for your wider foot profile — ${shoe.attributes.wideFootScore}/10 width`;
+  if (context.climate === 'rainy' && shoe.attributes.wetGripScore < 4) return `${shoe.model}: Low wet-grip (${shoe.attributes.wetGripScore}/10) — not safe for rainy conditions`;
+  if (shoe.category === 'lifestyle' && context.activity === 'running') return `${shoe.model}: Lifestyle sneaker — insufficient support for running`;
+  if (footProfile.pronation === 'overpronation' && !shoe.attributes.pronationSupport.includes('overpronation')) return `${shoe.model}: No overpronation support`;
+  if (context.priority === 'performance' && shoe.attributes.raceUseScore < 3) return `${shoe.model}: Comfort-focused — lacks responsive energy return`;
+  if (context.hoursPerDay >= 8 && shoe.attributes.longWearComfortScore < 5) return `${shoe.model}: Cushioning insufficient for ${context.hoursPerDay}-hour wear`;
+  return `${shoe.model}: The ${winner.model} outperforms on key attributes for your profile`;
+}
+

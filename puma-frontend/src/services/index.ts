@@ -4,3 +4,8 @@ export {
   DEFAULT_WEIGHTS,
   type ScoringWeights,
 } from './recommendationEngine';
+
+export {
+  generateMatchReasons,
+  generateEliminationReason,
+} from './explanationGenerator';

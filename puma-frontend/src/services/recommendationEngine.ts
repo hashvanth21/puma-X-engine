@@ -1,4 +1,5 @@
-import type { Shoe, FootProfile, UserContext, Recommendation, MatchReason } from '@/types';
+import type { Shoe, FootProfile, UserContext, Recommendation } from '@/types';
+import { generateMatchReasons, generateEliminationReason } from './explanationGenerator';
 
 // ─── Scoring Configuration ───────────────────────────────────────
 
@@ -175,12 +176,11 @@ export function generateRecommendation(
   const alternate = scored[1];
   const eliminated = scored.slice(2, 5); // Top 3 eliminated for display
 
-  // Placeholder reasons — Plan 04-03 integrates the explanation generator
-  const primaryReasons: MatchReason[] = [];
+  const primaryReasons = generateMatchReasons(primary.shoe, footProfile, context);
 
   const eliminatedShoes = eliminated.map((entry) => ({
     shoe: entry.shoe,
-    reason: `Outscored by ${primary.shoe.model} (${primary.score}% vs ${entry.score}%)`,
+    reason: generateEliminationReason(entry.shoe, primary.shoe, footProfile, context),
   }));
 
   return {
