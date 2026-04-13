@@ -56,6 +56,9 @@ export interface Shoe {
   category: 'running' | 'lifestyle' | 'training';
   attributes: ShoeAttribute;
   description: string;
+  techFeatures: string[];
+  tagline: string;
+  modelYear: number;
 }
 
 export interface MatchReason {
