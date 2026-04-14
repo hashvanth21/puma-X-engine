@@ -3,17 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageWrapper, Button, Badge, ProductCard } from '@/components';
 import { staggerContainer, fadeInUp, heroFloat, heroFloatLoop } from '@/design/animations';
 import { ArrowRight, Shield, Zap, Target, ChevronRight } from 'lucide-react';
-
-const mockShoes = [
-  { id: '1', name: 'Velocity Nitro 3', price: '$139', category: 'Running', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop', colors: ['blue', 'black'] },
-  { id: '2', name: 'Deviate NITRO Elite 3', price: '$250', category: 'Racing', image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&h=600&fit=crop', colors: ['white', 'red'] },
-  { id: '3', name: 'ForeverRun NITRO', price: '$159', category: 'Daily Run', image: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&h=600&fit=crop', colors: ['gray', 'blue'] },
-  { id: '4', name: 'Softride Pro', price: '$89', category: 'Lifestyle', image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&h=600&fit=crop', colors: ['white', 'black'] },
-  { id: '5', name: 'RS-X Efekt', price: '$120', category: 'Lifestyle', image: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=600&h=600&fit=crop', colors: ['green', 'white'] },
-  { id: '6', name: 'Electrify NITRO 3', price: '$149', category: 'Speed', image: 'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600&h=600&fit=crop', colors: ['red', 'black'] },
-  { id: '7', name: 'Magnify NITRO 2', price: '$169', category: 'Cushion', image: 'https://images.unsplash.com/photo-1584735175315-9d5df23860e6?w=600&h=600&fit=crop', colors: ['black', 'gray'] },
-  { id: '8', name: 'Transport', price: '$99', category: 'Trail', image: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&h=600&fit=crop', colors: ['black', 'green'] },
-];
+import { SHOES_CATALOG } from '@/data/shoesCatalog';
 
 const problemQuestions = [
   { icon: Shield, text: 'Which fits my arch?' },
@@ -105,7 +95,7 @@ export default function Screen1Problem() {
               className="relative bg-bg-card rounded-hero shadow-deep p-8 aspect-square max-w-sm w-full flex items-center justify-center overflow-hidden"
             >
               <img
-                src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=800&fit=crop"
+                src="https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_800/global/377748/01/sv01/fnd/PNA/fmt/png"
                 alt="Featured PUMA sneaker"
                 className="w-full h-full object-cover rounded-card"
               />
@@ -136,12 +126,16 @@ export default function Screen1Problem() {
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {mockShoes.map((shoe, idx) => (
+            {SHOES_CATALOG.slice(0, 8).map((shoe, idx) => (
               <ProductCard
                 key={shoe.id}
-                {...shoe}
+                name={shoe.model}
+                price={`$${shoe.price}`}
+                category={shoe.category}
+                image={shoe.imageUrl}
+                colors={[]}
                 delay={idx * 0.06}
-                onQuickView={() => {}}
+                onQuickView={() => navigate('/scan')}
               />
             ))}
           </div>

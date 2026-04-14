@@ -10,7 +10,7 @@ const matchData = {
     category: 'Performance Running',
     price: '$139',
     matchScore: 94,
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=600&fit=crop',
+    image: 'https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_800/global/377748/01/sv01/fnd/PNA/fmt/png',
     colors: ['Electric Blue', 'Black/White'],
     reasons: [
       { icon: Shield, text: 'Standard width last matches your foot profile' },
@@ -23,7 +23,7 @@ const matchData = {
     category: 'Daily Running',
     price: '$159',
     matchScore: 87,
-    image: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800&h=600&fit=crop',
+    image: 'https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_800/global/310109/01/sv01/fnd/PNA/fmt/png',
   },
   eliminated: [
     { name: 'Deviate NITRO Elite 3', reason: 'Racing plate too aggressive for daily use', score: 62 },
