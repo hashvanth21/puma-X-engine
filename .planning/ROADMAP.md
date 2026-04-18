@@ -138,6 +138,12 @@ Plans:
   4. Feedback responses persisted with recommendation_id reference
   5. Database tables (scan_profiles, recommendations, feedback) created and queryable
   6. At least one end-to-end flow produces a complete recommendation event record
+**Plans**: 3 plans
+
+Plans:
+- [ ] 07-01: Database Schema & Event Service — Supabase tables, TypeScript event types, event logging service (Wave 1)
+- [ ] 07-02: Backend Routes & Frontend Analytics Store — API endpoints, Zustand analytics slice, interaction buffering (Wave 2)
+- [ ] 07-03: Feedback UI & End-to-End Integration — FeedbackModal component, interaction tracking wiring, full pipeline (Wave 3)
 
 ### Phase 8: Data Normalization & Insight Pipeline
 **Goal**: Build data normalization layer that transforms raw recommendation events and feedback into a structured dataset where every row links foot profile + use case + shoe model + outcome. Build automated insight report generation: Model Success Report (per-shoe perfect-fit rate), Problem Model Report (failure patterns by foot type), Foot-Type Cluster Report (preference patterns). Store insights in weekly_insights table for trend analysis.
@@ -188,7 +194,7 @@ Phases execute sequentially: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 �
 | 4. Shoe Intelligence DB & Engine | 3/3 | Complete | 2026-04-13 |
 | 5. Match Result & Comparison UI | 0/3 | Not started | - |
 | 6. Ecosystem Vision & Polish | 0/2 | Not started | - |
-| 7. Data Moat – Event Instrumentation & Feedback | 0/0 | Not started | - |
+| 7. Data Moat – Event Instrumentation & Feedback | 0/3 | Planned | - |
 | 8. Data Normalization & Insight Pipeline | 0/0 | Not started | - |
 | 9. ML Classification & Hybrid Scoring | 0/0 | Not started | - |
 | 10. ML Retraining, Explainability & Evolution | 0/0 | Not started | - |
