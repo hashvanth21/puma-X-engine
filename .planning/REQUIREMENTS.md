@@ -59,6 +59,25 @@ Requirements for demo/POC release. Each maps to roadmap phases.
 - [ ] **TECH-04**: State management with Zustand
 - [ ] **TECH-05**: Demo backend: Node.js + Express with PostgreSQL or Supabase
 
+### Data Moat
+
+- [ ] **DATA-01**: System tracks all recommendation sessions with complete event data (session_id, scan profile, use case, top-3 models, selected model, confidence score)
+- [ ] **DATA-02**: System captures structured user feedback post-recommendation (fit result, use case result, style preference)
+- [ ] **DATA-03**: Interaction behavior events tracked (clicked_primary, opened_alternatives, time_spent, changed_use_case, re-ran_scan)
+- [ ] **DATA-04**: Raw recommendation events normalized into structured dataset (width + arch + use_case + shoe_model + outcome per row)
+- [ ] **DATA-05**: Automated weekly insight reports generated (model success rates, problem models by foot type, foot-type preference clusters)
+- [ ] **DATA-06**: Database schema supports users, scan_profiles, recommendations, feedback, shoe_metadata, weekly_insights collections
+
+### ML Engine
+
+- [ ] **ML-01**: Binary classification model predicts recommendation success probability per shoe
+- [ ] **ML-02**: ML dataset prepared with proper feature engineering and label conversion (perfect fit/slightly tight/loose = Success; too tight/too loose = Fail)
+- [ ] **ML-03**: XGBoost classifier trained on collected recommendation outcomes with cross-validation
+- [ ] **ML-04**: Hybrid scoring blends rule engine score (60%) with ML success probability (40%)
+- [ ] **ML-05**: Weekly retraining pipeline appends new outcomes and retrains model
+- [ ] **ML-06**: Confidence explanation UI shows "users like you" reasoning with specific stats
+- [ ] **ML-07**: Long-term ML roadmap documented (multi-class ranking → collaborative filtering → personalized engine)
+
 ## v2 Requirements
 
 Deferred to future release (PRD Phases 2–4).
@@ -129,12 +148,28 @@ Deferred to future release (PRD Phases 2–4).
 | TECH-03 | Phase 2 | Pending |
 | TECH-04 | Phase 1 | Pending |
 | TECH-05 | Phase 1 | Pending |
+| DATA-01 | Phase 7 | Pending |
+| DATA-02 | Phase 7 | Pending |
+| DATA-03 | Phase 7 | Pending |
+| DATA-04 | Phase 8 | Pending |
+| DATA-05 | Phase 8 | Pending |
+| DATA-06 | Phase 7 | Pending |
+| ML-01 | Phase 9 | Pending |
+| ML-02 | Phase 9 | Pending |
+| ML-03 | Phase 9 | Pending |
+| ML-04 | Phase 9 | Pending |
+| ML-05 | Phase 10 | Pending |
+| ML-06 | Phase 10 | Pending |
+| ML-07 | Phase 10 | Pending |
 
 **Coverage:**
 - v1 requirements: 34 total
-- Mapped to phases: 34
+- Data Moat requirements: 6 total
+- ML Engine requirements: 7 total
+- Grand total: 47
+- Mapped to phases: 47
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after PRD Express Path initialization*
+*Last updated: 2026-04-18 after Data Moat & ML Upgrade execution plan*
