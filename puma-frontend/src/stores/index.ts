@@ -1,8 +1,11 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { FootProfile, UserContext, Recommendation } from '@/types';
+import { createAnalyticsSlice, type AnalyticsSlice, type InteractionEvent } from './analyticsStore';
 
-export interface AppStore {
+export type { InteractionEvent };
+
+export interface AppStore extends AnalyticsSlice {
   footProfile: FootProfile | null;
   setFootProfile: (profile: FootProfile) => void;
   resetFootProfile: () => void;
@@ -20,25 +23,45 @@ export interface AppStore {
 
 export const useAppStore = create<AppStore>()(
   devtools(
-    (set) => ({
+    (set, get) => ({
+      // ─── Analytics slice ──────────────────────────────────
+      ...createAnalyticsSlice(
+        (partial) => set(partial as Partial<AppStore>),
+        () => get() as AnalyticsSlice
+      ),
+
+      // ─── Foot Profile ─────────────────────────────────────
       footProfile: null,
       setFootProfile: (profile) => set({ footProfile: profile }),
       resetFootProfile: () => set({ footProfile: null }),
+
+      // ─── Context / Questionnaire ──────────────────────────
       context: {},
       setContextField: (key, value) => set((state) => ({ context: { ...state.context, [key]: value } })),
       resetContext: () => set({ context: {} }),
+
+      // ─── Recommendation ───────────────────────────────────
       recommendation: null,
       setRecommendation: (rec) => set({ recommendation: rec }),
       resetRecommendation: () => set({ recommendation: null }),
+
+      // ─── Screen navigation ────────────────────────────────
       currentScreen: 1,
       advanceScreen: () => set((state) => ({ currentScreen: state.currentScreen + 1 })),
       goToScreen: (n) => set({ currentScreen: n }),
-      resetAll: () => set({
-        footProfile: null,
-        context: {},
-        recommendation: null,
-        currentScreen: 1,
-      }),
+
+      // ─── Global reset ─────────────────────────────────────
+      resetAll: () => {
+        const { resetAnalytics } = get();
+        resetAnalytics();
+        set({
+          footProfile: null,
+          context: {},
+          recommendation: null,
+          currentScreen: 1,
+          recommendationId: null,
+        });
+      },
     }),
     { name: 'puma-store' }
   )
@@ -47,3 +70,4 @@ export const useAppStore = create<AppStore>()(
 export { createFootProfileSlice, type FootProfileSlice } from './footProfileStore';
 export { createQuestionnaireSlice, type QuestionnaireSlice } from './questionnaireStore';
 export { createRecommendationSlice, type RecommendationSlice } from './recommendationStore';
+export { createAnalyticsSlice, type AnalyticsSlice } from './analyticsStore';
