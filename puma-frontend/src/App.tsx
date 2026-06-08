@@ -4,7 +4,7 @@ import { NavBar } from '@/components';
 import { useAppStore } from '@/stores';
 
 // Lazy-load screens for code splitting
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 const Screen1Problem = lazy(() => import('@/screens/Screen1Problem/Screen1Problem'));
 const Screen2FootScan = lazy(() => import('@/screens/Screen2FootScan/Screen2FootScan'));
 const Screen3Questions = lazy(() => import('@/screens/Screen3Questions/Screen3Questions'));
@@ -18,10 +18,27 @@ const ScreenFallback = () => (
   </div>
 );
 
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const { resetAll } = useAppStore();
+
+  // Flush remaining interaction events on tab close via sendBeacon
+  useEffect(() => {
+    const handleUnload = () => {
+      const events = useAppStore.getState().interactionBuffer;
+      if (events.length > 0) {
+        navigator.sendBeacon(
+          `${API_BASE}/api/events`,
+          JSON.stringify({ events })
+        );
+      }
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, []);
 
   const handleReset = () => {
     resetAll();

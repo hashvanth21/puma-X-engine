@@ -1,8 +1,11 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Shield, Zap, Heart, Star, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Shield, Zap, Heart, Star, X, MessageSquare } from 'lucide-react';
 import { PageWrapper, Button, Card, Badge } from '@/components';
+import FeedbackModal from '@/components/FeedbackModal';
 import { staggerContainer, fadeInUp, itemReveal, scaleReveal } from '@/design/animations';
+import { useAppStore } from '@/stores';
 
 const matchData = {
   primary: {
@@ -33,6 +36,48 @@ const matchData = {
 
 export default function Screen4Match() {
   const navigate = useNavigate();
+  const { sessionId, recommendationId, trackInteraction, flushEvents } = useAppStore();
+
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [showFeedbackPrompt, setShowFeedbackPrompt] = useState(false);
+  const [alternativesExpanded, setAlternativesExpanded] = useState(false);
+
+  // Track time spent on this screen + flush on unmount
+  useEffect(() => {
+    const start = Date.now();
+    return () => {
+      trackInteraction('time_spent', { duration_ms: Date.now() - start });
+      flushEvents();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Delayed feedback prompt — show after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setShowFeedbackPrompt(true), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handlePrimaryClick = () => {
+    trackInteraction('clicked_primary', { model: matchData.primary.name });
+  };
+
+  const handleAlternativesExpand = () => {
+    if (!alternativesExpanded) {
+      trackInteraction('opened_alternatives');
+    }
+    setAlternativesExpanded((prev) => !prev);
+  };
+
+  const handleFeedbackOpen = () => {
+    setFeedbackOpen(true);
+    setShowFeedbackPrompt(false);
+  };
+
+  const handleFeedbackClose = () => {
+    setFeedbackOpen(false);
+    flushEvents();
+  };
 
   return (
     <PageWrapper className="px-4 pb-16">
@@ -113,7 +158,7 @@ export default function Screen4Match() {
 
               {/* Actions */}
               <div className="flex gap-3">
-                <Button variant="accent" size="md" className="flex-1">
+                <Button variant="accent" size="md" className="flex-1" onClick={handlePrimaryClick}>
                   Add to Cart
                 </Button>
                 <Button variant="primary" size="md" onClick={() => navigate('/compare')}>
@@ -126,26 +171,43 @@ export default function Screen4Match() {
 
         {/* Alternate Shoe */}
         <motion.div variants={fadeInUp}>
-          <h3 className="font-display font-bold text-lg text-text-primary mb-3">
-            Also Great For You
-          </h3>
-          <Card hoverable className="p-4 flex items-center gap-4 mb-8">
-            <img
-              src={matchData.alternate.image}
-              alt={matchData.alternate.name}
-              className="w-20 h-20 rounded-xl object-cover"
-            />
-            <div className="flex-1">
-              <p className="text-xs text-text-muted uppercase tracking-wider">{matchData.alternate.category}</p>
-              <p className="font-display font-semibold text-text-primary">{matchData.alternate.name}</p>
-              <p className="text-text-secondary font-medium">{matchData.alternate.price}</p>
-            </div>
-            <div className="text-right">
-              <span className="text-accent-red font-display font-bold text-xl">
-                {matchData.alternate.matchScore}%
-              </span>
-            </div>
-          </Card>
+          <button
+            className="w-full text-left mb-3"
+            onClick={handleAlternativesExpand}
+          >
+            <h3 className="font-display font-bold text-lg text-text-primary">
+              Also Great For You {alternativesExpanded ? '▲' : '▼'}
+            </h3>
+          </button>
+          <AnimatePresence>
+            {alternativesExpanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden mb-8"
+              >
+                <Card hoverable className="p-4 flex items-center gap-4">
+                  <img
+                    src={matchData.alternate.image}
+                    alt={matchData.alternate.name}
+                    className="w-20 h-20 rounded-xl object-cover"
+                  />
+                  <div className="flex-1">
+                    <p className="text-xs text-text-muted uppercase tracking-wider">{matchData.alternate.category}</p>
+                    <p className="font-display font-semibold text-text-primary">{matchData.alternate.name}</p>
+                    <p className="text-text-secondary font-medium">{matchData.alternate.price}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-accent-red font-display font-bold text-xl">
+                      {matchData.alternate.matchScore}%
+                    </span>
+                  </div>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {!alternativesExpanded && <div className="mb-8" />}
         </motion.div>
 
         {/* Why Not Others */}
@@ -173,6 +235,44 @@ export default function Screen4Match() {
           </div>
         </motion.div>
 
+        {/* Feedback Prompt — appears after 5s */}
+        <AnimatePresence>
+          {showFeedbackPrompt && !feedbackOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="mt-8"
+            >
+              <div className="bg-bg-card border border-white/10 rounded-2xl p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-accent-red/10 flex items-center justify-center">
+                    <MessageSquare size={16} className="text-accent-red" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-text-primary">How was this recommendation?</p>
+                    <p className="text-xs text-text-muted">Takes 30 seconds</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleFeedbackOpen}
+                    className="px-4 py-2 bg-accent-red text-white text-xs font-semibold rounded-xl hover:bg-accent-red/90 transition-colors"
+                  >
+                    Give Feedback
+                  </button>
+                  <button
+                    onClick={() => setShowFeedbackPrompt(false)}
+                    className="p-2 text-text-muted hover:text-text-primary transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Navigation */}
         <motion.div variants={itemReveal} className="mt-10 flex items-center justify-between">
           <Button variant="primary" size="sm" onClick={() => navigate('/questions')}>
@@ -185,6 +285,15 @@ export default function Screen4Match() {
           </Button>
         </motion.div>
       </motion.div>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={feedbackOpen}
+        onClose={handleFeedbackClose}
+        recommendationId={recommendationId}
+        sessionId={sessionId}
+        shoeModel={matchData.primary.name}
+      />
     </PageWrapper>
   );
 }
