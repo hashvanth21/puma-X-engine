@@ -71,8 +71,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Questionnaire framework — step engine, state management, progress indicator, transitions
-- [ ] 03-02: Individual question screens — use case cards, hours picker, activity cards, climate cards, priority slider
+- [x] 03-01: Questionnaire framework — step engine, state management, progress indicator, transitions
+- [x] 03-02: Individual question screens — use case cards, hours picker, activity cards, climate cards, priority slider
 
 ### Phase 4: Shoe Intelligence Database & Recommendation Engine
 **Goal**: Build the shoe catalog database (10+ PUMA models with full biomechanical metadata) and the recommendation engine. Engine takes foot profile + context inputs, scores all models, returns ranked results with primary + alternate recommendations and structured explanation text. Expose as a clean API/service callable from the frontend.
@@ -106,9 +106,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 05-01: Screen 4 — Match hero card, match percentage donut, reason chips, "why not others" section
-- [ ] 05-02: Screen 5 — Comparison table with attribute score bars, icons, winner indicators
-- [ ] 05-03: 3D shoe viewer — Three.js/R3F model or fallback rich product image card
+- [x] 05-01: Screen 4 — Match hero card, match percentage donut, reason chips, "why not others" section
+- [x] 05-02: Screen 5 — Comparison table with attribute score bars, icons, winner indicators
+- [x] 05-03: 3D shoe viewer — Three.js/R3F model or fallback rich product image card
 
 ### Phase 6: Ecosystem Vision & Demo Polish
 **Goal**: Build Screen 6 — the future ecosystem vision (apparel, training, replacement, loyalty). Then complete end-to-end demo flow polish: ensure all 6 screens flow seamlessly, add demo kiosk mode (auto-advance / reset), performance optimization, and final visual polish pass. Prepare for PUMA presentation.
@@ -192,7 +192,7 @@ Phases execute sequentially: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 �
 | 2. Foot Scan Module | 3/3 | Complete | 2026-04-03 |
 | 3. Context Questionnaire | 2/2 | Complete | 2026-04-06 |
 | 4. Shoe Intelligence DB & Engine | 3/3 | Complete | 2026-04-13 |
-| 5. Match Result & Comparison UI | 0/3 | Not started | - |
+| 5. Match Result & Comparison UI | 3/3 | Complete | 2026-04-14 |
 | 6. Ecosystem Vision & Polish | 0/2 | Not started | - |
 | 7. Data Moat – Event Instrumentation & Feedback | 0/3 | Planned | - |
 | 8. Data Normalization & Insight Pipeline | 0/0 | Not started | - |
