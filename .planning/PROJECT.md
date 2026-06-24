@@ -90,5 +90,10 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
----
-*Last updated: 2026-04-03 — Phase 2 (Foot Scan Module) complete*
+## Current State
+
+Phase 09 complete — ML classifier and hybrid scoring engine integrated.
+
+Next up: Phase 10 (ML Retraining & Explainability Evolution)
+
+*Last updated: 2026-06-25*
