@@ -1,12 +1,13 @@
 import { Router, Request, Response } from 'express';
 import { SHOES_CATALOG } from '../data/shoes';
 import { generateRecommendation } from '../services/scoringEngine';
+import { applyHybridScoring } from '../services/hybridScoringService';
 import { logRecommendationEvent, logScanProfile, updateSelectedModel } from '../services/eventService';
 import type { RecommendRequest } from '../services/scoringEngine';
 
 const router = Router();
 
-// POST /api/recommend — accept foot profile + context, return recommendation
+// POST /api/recommend — accept foot profile + context, return hybrid recommendation
 router.post('/', async (req: Request, res: Response) => {
   const { footProfile, context, session_id } = req.body as RecommendRequest & { session_id?: string };
 
@@ -25,9 +26,41 @@ router.post('/', async (req: Request, res: Response) => {
     return;
   }
 
-  const recommendation = generateRecommendation(footProfile, context, SHOES_CATALOG);
+  // ── Step 1: Hybrid scoring ──────────────────────────────────────────────────
+  const hybridResult = applyHybridScoring(SHOES_CATALOG, footProfile, context);
 
-  // Fire-and-forget: log scan profile and recommendation event
+  // ── Step 2: Generate explanation text (using rule engine explanation generator)
+  // We pass the full catalog; generateRecommendation will rank by rule score.
+  // We then override primary/alternate with hybrid winners.
+  const baseRecommendation = generateRecommendation(footProfile, context, SHOES_CATALOG);
+
+  // Override primary/alternate with hybrid winners (explanation reasons stay from base)
+  const recommendation = {
+    ...baseRecommendation,
+    primary: hybridResult.primary.shoe,
+    primaryMatchScore: hybridResult.primary.hybrid_score,
+    alternate: hybridResult.alternate.shoe,
+    alternateMatchScore: hybridResult.alternate.hybrid_score,
+    // Expose eliminated shoes from hybrid ordering (positions 3-5)
+    eliminatedShoes: hybridResult.all_scored.slice(2, 5).map(entry => ({
+      shoe: entry.shoe,
+      reason: baseRecommendation.eliminatedShoes.find(e => e.shoe.model === entry.shoe.model)?.reason
+        ?? `${entry.shoe.model}: Lower hybrid match score (rule: ${entry.rule_score}, ml: ${Math.round(entry.ml_probability * 100)}%)`,
+    })),
+  };
+
+  // ML confidence for the primary recommendation
+  const ml_confidence = {
+    probability: hybridResult.primary.ml_probability,
+    confidence: hybridResult.primary.ml_prediction.confidence,
+    top_features: hybridResult.primary.ml_prediction.top_features,
+    model_version: hybridResult.ml_model_version,
+    hybrid_weights: { rule_engine: '60%', ml_predictor: '40%' },
+    score_breakdown: hybridResult.primary.score_breakdown,
+    swapped_by_ml: hybridResult.swapped,
+  };
+
+  // ── Step 3: Fire-and-forget event logging ───────────────────────────────────
   let recommendationId: string | null = null;
   if (session_id) {
     const profileId = await logScanProfile({
@@ -39,14 +72,10 @@ router.post('/', async (req: Request, res: Response) => {
       fit_preference: undefined,
     }).catch(() => null);
 
-    // Build scored top-3 list
-    const top3 = [
-      { model: recommendation.primary.model, score: recommendation.primaryMatchScore },
-      { model: recommendation.alternate.model, score: recommendation.alternateMatchScore },
-      ...(recommendation.eliminatedShoes?.[0]
-        ? [{ model: recommendation.eliminatedShoes[0].shoe.model, score: 0 }]
-        : []),
-    ];
+    const top3 = hybridResult.all_scored.slice(0, 3).map(e => ({
+      model: e.shoe.model,
+      score: e.hybrid_score,
+    }));
 
     recommendationId = await logRecommendationEvent({
       session_id,
@@ -57,18 +86,18 @@ router.post('/', async (req: Request, res: Response) => {
       priority_score: context.priorityScore,
       hours_per_day: context.hoursPerDay,
       recommended_top3: top3,
-      primary_model: recommendation.primary.model,
-      primary_score: recommendation.primaryMatchScore,
-      alternate_model: recommendation.alternate.model,
-      alternate_score: recommendation.alternateMatchScore,
-      confidence_score: recommendation.primaryMatchScore,
+      primary_model: hybridResult.primary.shoe.model,
+      primary_score: hybridResult.primary.hybrid_score,
+      alternate_model: hybridResult.alternate.shoe.model,
+      alternate_score: hybridResult.alternate.hybrid_score,
+      confidence_score: Math.round(hybridResult.primary.ml_probability * 100),
     }).catch(() => null);
   }
 
-  res.json({ recommendation, recommendationId });
+  res.json({ recommendation, recommendationId, ml_confidence });
 });
 
-// PATCH /api/recommend/:id/select — record which shoe the user selected
+// PATCH /api/recommend/:id/select — record which shoe the user selected (unchanged)
 router.patch('/:id/select', async (req: Request, res: Response) => {
   const { id } = req.params;
   const { selected_model } = req.body as { selected_model: string };
