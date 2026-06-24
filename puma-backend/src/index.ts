@@ -6,6 +6,8 @@ import { shoesRouter } from './routes/shoes';
 import { recommendRouter } from './routes/recommend';
 import { eventsRouter } from './routes/events';
 import { feedbackRouter } from './routes/feedback';
+import { normalizeRouter } from './routes/normalize';
+import { insightsRouter } from './routes/insights';
 
 dotenv.config();
 const app = express();
@@ -19,6 +21,8 @@ app.use('/api/shoes', shoesRouter);
 app.use('/api/recommend', recommendRouter);
 app.use('/api/events', eventsRouter);
 app.use('/api/feedback', feedbackRouter);
+app.use('/api/normalize', normalizeRouter);
+app.use('/api/insights', insightsRouter);
 
 app.listen(PORT, () => {
   console.log(`PUMA Backend running on http://localhost:${PORT}`);

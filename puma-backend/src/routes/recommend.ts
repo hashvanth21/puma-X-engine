@@ -35,8 +35,8 @@ router.post('/', async (req: Request, res: Response) => {
       width: footProfile.width,
       arch: footProfile.arch,
       pronation: footProfile.pronation,
-      foot_length: footProfile.size,
-      fit_preference: footProfile.fitPreference,
+      foot_length: footProfile.estimatedSize,
+      fit_preference: undefined,
     }).catch(() => null);
 
     // Build scored top-3 list
@@ -78,7 +78,7 @@ router.patch('/:id/select', async (req: Request, res: Response) => {
     return;
   }
 
-  const success = await updateSelectedModel(id, selected_model);
+  const success = await updateSelectedModel(id as string, selected_model);
   if (success) {
     res.json({ success: true });
   } else {
