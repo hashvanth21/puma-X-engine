@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { FootProfile, UserContext, Recommendation } from '@/types';
+import type { FootProfile, UserContext, Recommendation, RecommendationWithML } from '@/types';
 import { createAnalyticsSlice, type AnalyticsSlice, type InteractionEvent } from './analyticsStore';
 
 export type { InteractionEvent };
@@ -13,7 +13,7 @@ export interface AppStore extends AnalyticsSlice {
   setContextField: <K extends keyof UserContext>(key: K, value: UserContext[K]) => void;
   resetContext: () => void;
   recommendation: Recommendation | null;
-  setRecommendation: (rec: Recommendation) => void;
+  setRecommendation: (rec: Recommendation | RecommendationWithML) => void;
   resetRecommendation: () => void;
   currentScreen: number;
   advanceScreen: () => void;

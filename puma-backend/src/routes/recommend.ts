@@ -3,6 +3,7 @@ import { SHOES_CATALOG } from '../data/shoes';
 import { generateRecommendation } from '../services/scoringEngine';
 import { applyHybridScoring } from '../services/hybridScoringService';
 import { logRecommendationEvent, logScanProfile, updateSelectedModel } from '../services/eventService';
+import { generateConfidenceExplanation, generateArchExplanation } from '../services/explanationConfidenceService';
 import type { RecommendRequest } from '../services/scoringEngine';
 
 const router = Router();
@@ -94,7 +95,23 @@ router.post('/', async (req: Request, res: Response) => {
     }).catch(() => null);
   }
 
-  res.json({ recommendation, recommendationId, ml_confidence });
+  // ── Step 4: Generate "users like you" explanation ──────────────────────────
+  const [ml_explanation_base, ml_arch_explanation] = await Promise.all([
+    generateConfidenceExplanation(
+      footProfile.width,
+      footProfile.arch,
+      context.useCase,
+      hybridResult.primary.shoe.model
+    ),
+    generateArchExplanation(footProfile.arch, hybridResult.primary.shoe.model),
+  ]);
+
+  const ml_explanation = {
+    ...ml_explanation_base,
+    arch_explanation: ml_arch_explanation,
+  };
+
+  res.json({ recommendation, recommendationId, ml_confidence, ml_explanation });
 });
 
 // PATCH /api/recommend/:id/select — record which shoe the user selected (unchanged)

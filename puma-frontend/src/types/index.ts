@@ -86,3 +86,27 @@ export interface AppState {
   context: UserContext | null;
   recommendation: Recommendation | null;
 }
+
+export interface MLConfidence {
+  probability: number;          // 0-1
+  confidence: 'high' | 'medium' | 'low';
+  top_features: string[];       // raw feature keys e.g. 'wide_foot_compatibility'
+  model_version: string;        // e.g. 'feature-weight-v1'
+  hybrid_weights: { rule_engine: string; ml_predictor: string };
+  score_breakdown: { rule_contribution: number; ml_contribution: number };
+  swapped_by_ml: boolean;
+}
+
+export interface MLExplanation {
+  explanation: string;          // "89% of users with wide forefoot + office use had best results with CA Pro"
+  similar_users_count: number;
+  success_rate: number;         // 0-1
+  match_criteria: string[];     // e.g. ['wide', 'office-wear']
+  data_source: 'similar_users' | 'model_average' | 'prior';
+  arch_explanation: string;     // "Biomechanically suited for neutral arch profiles"
+}
+
+export interface RecommendationWithML extends Recommendation {
+  mlConfidence: MLConfidence | null;
+  mlExplanation: MLExplanation | null;
+}

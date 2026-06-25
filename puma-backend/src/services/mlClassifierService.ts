@@ -31,7 +31,7 @@ function getShoeAttributes(modelName: string) {
  *   const { probability } = await response.json();
  * The FeatureVector schema in mlDatasetService.ts remains the same.
  */
-const FEATURE_WEIGHTS = {
+export const FEATURE_WEIGHTS = {
   // Foot-shoe fit is the most important factor
   footProfileMatch: 0.45,
   // Use case alignment
